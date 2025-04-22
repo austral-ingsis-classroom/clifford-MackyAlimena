@@ -1,4 +1,4 @@
-package edu.austral.ingsis.clifford.command;
+package edu.austral.ingsis.clifford.commands.types;
 
 import edu.austral.ingsis.clifford.filesystem.FileSystem;
 import edu.austral.ingsis.clifford.filesystem.node.DirectoryNode;
