@@ -1,11 +1,11 @@
 package edu.austral.ingsis.clifford.filesystem.node;
 
 public interface FileSystemNode extends Comparable<FileSystemNode> {
-    String name();
+  String name();
 
-    boolean isDirectory();
+  boolean isDirectory();
 
-    default int compareTo(FileSystemNode o) {
-        return name().compareTo(o.name());
-    }
+  default int compareTo(FileSystemNode o) {
+    return name().compareTo(o.name());
+  }
 }
