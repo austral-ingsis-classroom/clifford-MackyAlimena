@@ -34,10 +34,33 @@ public class DirectoryNode implements FileSystemNode {
         children.removeIf(node -> node.name().equals(child));
     }
 
-    public Optional<FileSystemNode> getChild(String name) {
-        return children.stream()
-                .filter(child -> child.name().equals(name))
-                .findFirst();
+    public Optional<FileSystemNode> getChild(String path) {
+        int nextDir = path.indexOf("/");
+        // No more directories to go
+        if (nextDir == -1) {
+            return getFromName(path);
+        }
+        String next = path.substring(0, nextDir);
+        String remaining = path.substring(nextDir + 1);
+        if (remaining.isEmpty()) {
+            return getFromName(next);
+        } else {
+            Optional<FileSystemNode> child = getFromName(next);
+            if (child.isEmpty() || !child.get().isDirectory()) {
+                return Optional.empty();
+            }
+            DirectoryNode child1 = (DirectoryNode) child.get();
+            return child1.getChild(remaining);
+        }
+    }
+
+    private Optional<FileSystemNode> getFromName(String path) {
+        for (FileSystemNode node : children) {
+            if (node.name().equals(path)) {
+                return Optional.of(node);
+            }
+        }
+        return Optional.empty();
     }
 
     public List<FileSystemNode> getChildren() {

@@ -24,40 +24,46 @@ public class CdCommand implements Command{
     private String handleParentDirectory(FileSystem fileSystem) {
         DirectoryNode parent  = fileSystem.getCurrent().getParent();
         if (parent == null){
-            return "Already in root directory";
+            return "moved to directory '/'";
         } else {
             fileSystem.setCurrent(parent);
-            return "Moved to directory: '" + parent.getName() + "'";
+            return "moved to directory '" + parent.getName() + "'";
         }
     }
 
     private String handleCurrentDirectory(FileSystem fileSystem) {
-        return "Moved to directory: '" + fileSystem.getCurrent().getName() + "'";
+        return "moved to directory '" + fileSystem.getCurrent().getName() + "'";
     }
 
     private String handleRootPath(FileSystem fileSystem, String argument) {
-        String path = argument.substring(1);
-        if (path.isEmpty()) {
-            fileSystem.setCurrent(fileSystem.getRoot());
-            return "Moved to directory: '/'";
+        String[] parts = argument.split("/");
+        DirectoryNode current = fileSystem.getRoot();
+        for (String part : parts) {
+            if (part.isEmpty()) continue;
+            Optional<FileSystemNode> childOpt = current.getChild(part);
+            if (childOpt.isEmpty() || !childOpt.get().isDirectory()) {
+                return "'" + argument + "' directory does not exist";
+            }
+            current = (DirectoryNode) childOpt.get();
         }
-        Optional<FileSystemNode> nodeOpt = fileSystem.getRoot().getChild(path);
-        return validateAndMove(fileSystem, nodeOpt);    }
+        fileSystem.setCurrent(current);
+        return "moved to directory '" + (current == fileSystem.getRoot() ? "/" : current.getName()) + "'";
+    }
 
-    private String validateAndMove(FileSystem fileSystem, Optional<FileSystemNode> nodeOpt) {
+    private String validateAndMove(FileSystem fileSystem, Optional<FileSystemNode> nodeOpt, String argument) {
         if (nodeOpt.isEmpty()){
-            return "Directory not found";
+            return "'" + argument + "' directory does not exist";
         }
         FileSystemNode node = nodeOpt.get();
         if (!node.isDirectory()){
-            return "Cannot move to file";
+            return "cannot move to file";
         }
         fileSystem.setCurrent((DirectoryNode) node);
-        return "Moved to directory: '" + node.name() + "'";
+        return "moved to directory '" + node.name() + "'";
     }
 
     private String handleChildDirectory(FileSystem fileSystem, String argument) {
         Optional<FileSystemNode> nodeOpt = fileSystem.getCurrent().getChild(argument);
-        return validateAndMove(fileSystem, nodeOpt);
+        return validateAndMove(fileSystem, nodeOpt, argument);
     }
 }

@@ -3,6 +3,7 @@ package edu.austral.ingsis.clifford.commands.types;
 import edu.austral.ingsis.clifford.filesystem.FileSystem;
 import edu.austral.ingsis.clifford.filesystem.node.FileSystemNode;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,15 +15,22 @@ public class LsCommand implements Command {
 
         if (children.isEmpty()) return "";
 
-        // Parse the argument for sorting order
+        List<FileSystemNode> resultList = new ArrayList<>(children);
+
         if ("--ord=asc".equals(argument)) {
-            children.sort(Comparator.naturalOrder());
+            resultList.sort(Comparator.naturalOrder());
         } else if ("--ord=desc".equals(argument)) {
-            children.sort(Comparator.reverseOrder());
+            resultList.sort(Comparator.reverseOrder());
         }
-        // Else, return in the creation order
-        return children.stream()
+
+
+        return resultList.stream()
                 .map(FileSystemNode::name)
                 .collect(Collectors.joining(" "));
     }
 }
+
+
+
+
+

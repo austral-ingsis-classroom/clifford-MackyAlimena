@@ -17,7 +17,7 @@ public class RmCommand implements Command {
                 currentDirectory.removeChild(childName);
                 return "'" + childName + "' removed";
             } else {
-                return "File or directory not found";
+                return "file not found";
             }
         }
 
@@ -25,11 +25,12 @@ public class RmCommand implements Command {
         if (possibleChild.isPresent()) {
             FileSystemNode child = possibleChild.get();
             if (child.isDirectory()) {
-                return "Cannot remove '" + argument + "', is a directory";
+                return "cannot remove '" + argument + "', is a directory";
             }
             currentDirectory.removeChild(argument);
             return "'" + argument + "' removed";
         }
-        return "File or directory not found";
+        return "file not found";
+
     }
 }
