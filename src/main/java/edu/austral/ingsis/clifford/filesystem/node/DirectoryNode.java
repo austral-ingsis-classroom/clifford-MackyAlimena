@@ -1,18 +1,20 @@
 package edu.austral.ingsis.clifford.filesystem.node;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class DirectoryNode implements FileSystemNode {
   private final String name;
   private final DirectoryNode parent;
   private final List<FileSystemNode> children;
 
-  public DirectoryNode(String name, DirectoryNode parent) {
+  public DirectoryNode(String name, DirectoryNode parent, List<FileSystemNode> children) {
     this.name = name;
     this.parent = parent;
-    this.children = new ArrayList<>();
+    this.children = Collections.unmodifiableList(children);
   }
 
   public String getName() {
@@ -23,18 +25,22 @@ public class DirectoryNode implements FileSystemNode {
     return parent;
   }
 
-  public void addChild(FileSystemNode child) {
-    children.add(child);
-  }
+    public DirectoryNode addChild(FileSystemNode child) {
+        List<FileSystemNode> newChildren = children.stream().collect(Collectors.toList());
+        newChildren.add(child);
+        return new DirectoryNode(this.name, this.parent, newChildren);
+    }
 
   public boolean hasChild(String child) {
     return children.stream().anyMatch(node -> node.name().equals(child));
   }
 
-  public void removeChild(String child) {
-    children.removeIf(node -> node.name().equals(child));
-  }
-
+    public DirectoryNode removeChild(String childName) {
+        List<FileSystemNode> newChildren = children.stream()
+                .filter(node -> !node.name().equals(childName))
+                .collect(Collectors.toList());
+        return new DirectoryNode(this.name, this.parent, newChildren);
+    }
   public Optional<FileSystemNode> getChild(String path) {
     int nextDir = path.indexOf("/");
     // No more directories to go
@@ -55,14 +61,9 @@ public class DirectoryNode implements FileSystemNode {
     }
   }
 
-  private Optional<FileSystemNode> getFromName(String path) {
-    for (FileSystemNode node : children) {
-      if (node.name().equals(path)) {
-        return Optional.of(node);
-      }
+    private Optional<FileSystemNode> getFromName(String path) {
+        return children.stream().filter(node -> node.name().equals(path)).findFirst();
     }
-    return Optional.empty();
-  }
 
   public List<FileSystemNode> getChildren() {
     return children;
