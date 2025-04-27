@@ -27,22 +27,8 @@ public class FileSystem {
       this.current = directoryNode;
     }
   }
-
-  // Returns the full path from root to the current directory
-  public String getCurrentPath() {
-    DirectoryNode dir = current;
-    List<String> pathParts = new ArrayList<>();
-
-    // Traverses upward to root, collecting each directory name
-    while (dir != null && dir.getParent() != null) {
-      pathParts.add(dir.getName());
-      dir = dir.getParent();
-    }
-
-    // Reverses the list to build the path root - current
-    Collections.reverse(pathParts);
-
-    // Joins the parts with / into a string
-    return "/" + String.join("/", pathParts);
-  }
 }
+
+// Parseo de comandos
+// que el execute devuelva un Result en vez de String
+//Mover getCurrentPath a PwdCommand
