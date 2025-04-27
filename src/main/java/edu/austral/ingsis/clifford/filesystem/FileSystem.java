@@ -1,34 +1,33 @@
 package edu.austral.ingsis.clifford.filesystem;
 
 import edu.austral.ingsis.clifford.filesystem.node.DirectoryNode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class FileSystem {
-  private final DirectoryNode root = new DirectoryNode("/", null);
+    private final DirectoryNode root;
+    private final DirectoryNode current;
 
-  private DirectoryNode current;
-
-  public FileSystem() {
-    this.current = root;
-  }
-
-  public DirectoryNode getCurrent() {
-    return current;
-  }
-
-  public DirectoryNode getRoot() {
-    return root;
-  }
-
-  public void setCurrent(DirectoryNode directoryNode) {
-    if (directoryNode != null) {
-      this.current = directoryNode;
+    public FileSystem(DirectoryNode root, DirectoryNode current) {
+        this.root = root;
+        this.current = current;
     }
-  }
+
+    public static FileSystem init() {
+        DirectoryNode rootNode = new DirectoryNode("/", null, java.util.Collections.emptyList());
+        return new FileSystem(rootNode, rootNode);
+    }
+
+    public DirectoryNode getCurrent() {
+        return current;
+    }
+
+    public DirectoryNode getRoot() {
+        return root;
+    }
+
+    public FileSystem setCurrent(DirectoryNode newCurrent) {
+        return new FileSystem(this.root, newCurrent);
+    }
 }
 
 // Parseo de comandos
 // que el execute devuelva un Result en vez de String
-//Mover getCurrentPath a PwdCommand
