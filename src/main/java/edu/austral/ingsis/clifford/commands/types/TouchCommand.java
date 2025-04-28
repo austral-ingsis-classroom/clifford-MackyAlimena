@@ -2,6 +2,7 @@ package edu.austral.ingsis.clifford.commands.types;
 
 import edu.austral.ingsis.clifford.commands.result.Result;
 import edu.austral.ingsis.clifford.filesystem.FileSystem;
+import edu.austral.ingsis.clifford.filesystem.FileSystemUpdater;
 import edu.austral.ingsis.clifford.filesystem.node.DirectoryNode;
 import edu.austral.ingsis.clifford.filesystem.node.FileNode;
 
@@ -14,22 +15,19 @@ public class TouchCommand implements Command {
 
         DirectoryNode currentDir = fileSystem.getCurrent();
 
-        if (alreadyExists(currentDir, argument)) {
+        if (currentDir.hasChild(argument)) {
             return Result.error(fileSystem, "File already exists");
         }
 
         FileNode newFile = new FileNode(argument);
-        DirectoryNode updatedDir = currentDir.addChild(newFile);
-        FileSystem updatedFs = fileSystem.setCurrent(updatedDir);
+        DirectoryNode updatedCurrentDir = currentDir.addChild(newFile);
 
-        return Result.success(updatedFs, "'" + argument + "' file created");
+        FileSystem updatedFileSystem = FileSystemUpdater.replaceAndPropagate(fileSystem, updatedCurrentDir);
+
+        return Result.success(updatedFileSystem, "'" + argument + "' file created");
     }
 
     private boolean isValidName(String name) {
         return name != null && !name.contains("/") && !name.contains(" ");
-    }
-
-    private boolean alreadyExists(DirectoryNode currentDir, String argument) {
-        return currentDir.hasChild(argument);
     }
 }
