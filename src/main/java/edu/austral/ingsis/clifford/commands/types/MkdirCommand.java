@@ -29,10 +29,6 @@ public class MkdirCommand implements Command {
     // Aseguramos que el current sea el directorio actualizado (con el nuevo hijo)
     updatedFileSystem = new FileSystem(updatedFileSystem.getRoot(), updatedCurrentDir);
 
-    // Logs para debug
-    System.out.println("MKDIR Command: Created directory '" + argument + "'");
-    System.out.println("Updated Current: " + updatedFileSystem.getCurrent().name());
-    System.out.println("Root Children after mkdir:");
     updatedFileSystem
         .getRoot()
         .getChildren()

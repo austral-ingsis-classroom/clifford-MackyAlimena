@@ -53,18 +53,6 @@ public class DirectoryNode implements FileSystemNode {
     return children.stream().anyMatch(node -> node.name().equals(child));
   }
 
-  public static void printChildren(DirectoryNode node) {
-    System.out.println("Node: " + node.name());
-    System.out.println("Children: ");
-    for (FileSystemNode child : node.getChildren()) {
-      System.out.println("  - " + child.name());
-    }
-    if (node.getChildren().isEmpty()) {
-      System.out.println("  (no children)");
-    }
-    System.out.println("----------------------------");
-  }
-
   public Optional<FileSystemNode> getChild(String path) {
     int nextDir = path.indexOf("/");
     // No more directories to go
