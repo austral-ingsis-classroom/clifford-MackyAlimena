@@ -37,12 +37,6 @@ public class DirectoryNode implements FileSystemNode {
     List<FileSystemNode> newChildren = new ArrayList<>(children);
     newChildren.add(updatedChild);
 
-    System.out.println("Adding child: " + updatedChild.name() + " to " + this.name);
-    System.out.println(
-        "Children before: " + this.children.stream().map(FileSystemNode::name).toList());
-    System.out.println(
-        "Children after: " + newChildren.stream().map(FileSystemNode::name).toList());
-
     return new DirectoryNode(this.name, this.parent, newChildren);
   }
 
@@ -51,12 +45,6 @@ public class DirectoryNode implements FileSystemNode {
         children.stream()
             .filter(node -> !node.name().equals(childName))
             .collect(Collectors.toList());
-
-    System.out.println("Removing child: " + childName + " from " + this.name);
-    System.out.println(
-        "Children before: " + this.children.stream().map(FileSystemNode::name).toList());
-    System.out.println(
-        "Children after: " + newChildren.stream().map(FileSystemNode::name).toList());
 
     return new DirectoryNode(this.name, this.parent, newChildren);
   }
