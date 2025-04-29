@@ -8,11 +8,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandParser {
-    private FileSystem fileSystem;
+    private final FileSystem fileSystem;
     private final Map<String, Command> commandMap = new HashMap<>();
 
     public CommandParser() {
         this.fileSystem = FileSystem.init();
+        initializeCommands();
+    }
+
+    public CommandParser(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
         initializeCommands();
     }
 
@@ -29,7 +34,7 @@ public class CommandParser {
         return fileSystem;
     }
 
-    public String parse(String input) {
+    public Result parse(String input) {
         int spaceIndex = input.indexOf(" ");
         String commandName;
         String argument;
@@ -44,11 +49,10 @@ public class CommandParser {
 
         Command command = commandMap.get(commandName);
         if (command == null) {
-            return "Command not found";
+            return Result.error(fileSystem,"Command not found");
         }
 
-        Result result = command.execute(fileSystem, argument);
-        this.fileSystem = result.getFileSystem();
-        return result.getMessage();
+        return command.execute(fileSystem, argument);
+
     }
 }

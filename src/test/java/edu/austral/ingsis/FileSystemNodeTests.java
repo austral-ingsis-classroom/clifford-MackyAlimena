@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.austral.ingsis.clifford.commands.CommandParser;
-import edu.austral.ingsis.clifford.filesystem.FileSystem;
 import org.junit.jupiter.api.Test;
 
 public class FileSystemNodeTests {
@@ -15,24 +14,17 @@ public class FileSystemNodeTests {
   private final CommandRunner runner = new CommandRunner();
 
     private void executeTest(List<Map.Entry<String, String>> commands) {
-        CommandParser parser = new CommandParser();
-        for (Map.Entry<String, String> entry : commands) {
-            String command = entry.getKey();
-            String expected = entry.getValue();
-            String actual = parser.parse(command);
+        List<String> commandInputs = commands.stream()
+                .map(Map.Entry::getKey)
+                .toList();
 
-            // LOG: estado actual del FileSystem
-            System.out.println("--- After command: " + command + " ---");
-            System.out.println("Expected: " + expected);
-            System.out.println("Actual  : " + actual);
-            System.out.println("Current Dir: " + parser.getFileSystem().getCurrent().name());
-            System.out.println("Root Children: ");
-            parser.getFileSystem().getRoot().getChildren()
-                    .forEach(child -> System.out.println("  - " + child.name()));
-            System.out.println("----------------------------");
+        List<String> actual = runner.executeCommands(commandInputs);
 
-            assertEquals(expected, actual);
-        }
+        List<String> expected = commands.stream()
+                .map(Map.Entry::getValue)
+                .toList();
+
+        assertEquals(expected, actual);
     }
 
 
@@ -77,22 +69,6 @@ public class FileSystemNodeTests {
 
   @Test
   void test4() {
-      System.out.println("--- Test Start ---");
-    executeTest(
-        List.of(
-            entry("mkdir horace", "'horace' directory created"),
-            entry("mkdir emily", "'emily' directory created"),
-            entry("cd horace", "moved to directory 'horace'"),
-            entry("mkdir jetta", "'jetta' directory created"),
-            entry("cd ..", "moved to directory '/'"),
-            entry("cd horace/jetta", "moved to directory 'jetta'"),
-            entry("pwd", "/horace/jetta"),
-            entry("cd /", "moved to directory '/'")));
-      System.out.println("--- Test Finnish ---");
-  }
-
-  @Test
-  void test5() {
     executeTest(
         List.of(
             entry("mkdir emily", "'emily' directory created"),
@@ -100,12 +76,12 @@ public class FileSystemNodeTests {
   }
 
   @Test
-  void test6() {
+  void test5() {
     executeTest(List.of(entry("cd ..", "moved to directory '/'")));
   }
 
   @Test
-  void test7() {
+  void test6() {
     executeTest(
         List.of(
             entry("mkdir horace", "'horace' directory created"),
@@ -118,7 +94,7 @@ public class FileSystemNodeTests {
   }
 
   @Test
-  void test8() {
+  void test7() {
     executeTest(
         List.of(
             entry("mkdir emily", "'emily' directory created"),
