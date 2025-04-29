@@ -26,21 +26,55 @@ public class DirectoryNode implements FileSystemNode {
   }
 
     public DirectoryNode addChild(FileSystemNode child) {
-        List<FileSystemNode> newChildren = children.stream().collect(Collectors.toList());
-        newChildren.add(child);
+        FileSystemNode updatedChild;
+        if (child instanceof DirectoryNode) {
+            DirectoryNode dirChild = (DirectoryNode) child;
+            updatedChild = new DirectoryNode(dirChild.name(), this, dirChild.getChildren());
+        } else {
+            updatedChild = child;
+        }
+
+        List<FileSystemNode> newChildren = new ArrayList<>(children);
+        newChildren.add(updatedChild);
+
+        System.out.println("Adding child: " + updatedChild.name() + " to " + this.name);
+        System.out.println("Children before: " + this.children.stream().map(FileSystemNode::name).toList());
+        System.out.println("Children after: " + newChildren.stream().map(FileSystemNode::name).toList());
+
         return new DirectoryNode(this.name, this.parent, newChildren);
     }
-
-  public boolean hasChild(String child) {
-    return children.stream().anyMatch(node -> node.name().equals(child));
-  }
 
     public DirectoryNode removeChild(String childName) {
         List<FileSystemNode> newChildren = children.stream()
                 .filter(node -> !node.name().equals(childName))
                 .collect(Collectors.toList());
+
+        System.out.println("Removing child: " + childName + " from " + this.name);
+        System.out.println("Children before: " + this.children.stream().map(FileSystemNode::name).toList());
+        System.out.println("Children after: " + newChildren.stream().map(FileSystemNode::name).toList());
+
         return new DirectoryNode(this.name, this.parent, newChildren);
     }
+
+
+
+    public boolean hasChild(String child) {
+    return children.stream().anyMatch(node -> node.name().equals(child));
+  }
+
+    public static void printChildren(DirectoryNode node) {
+        System.out.println("Node: " + node.name());
+        System.out.println("Children: ");
+        for (FileSystemNode child : node.getChildren()) {
+            System.out.println("  - " + child.name());
+        }
+        if (node.getChildren().isEmpty()) {
+            System.out.println("  (no children)");
+        }
+        System.out.println("----------------------------");
+    }
+
+
   public Optional<FileSystemNode> getChild(String path) {
     int nextDir = path.indexOf("/");
     // No more directories to go
@@ -69,7 +103,9 @@ public class DirectoryNode implements FileSystemNode {
     return children;
   }
 
-  @Override
+
+
+    @Override
   public String name() {
     return name;
   }

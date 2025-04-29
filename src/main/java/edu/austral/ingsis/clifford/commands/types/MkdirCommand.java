@@ -2,10 +2,10 @@ package edu.austral.ingsis.clifford.commands.types;
 
 import edu.austral.ingsis.clifford.commands.result.Result;
 import edu.austral.ingsis.clifford.filesystem.FileSystem;
+import edu.austral.ingsis.clifford.filesystem.FileSystemUpdater;
 import edu.austral.ingsis.clifford.filesystem.node.DirectoryNode;
 
-import java.util.List;
-
+import java.util.Collections;
 
 public class MkdirCommand implements Command {
     @Override
@@ -16,24 +16,29 @@ public class MkdirCommand implements Command {
 
         DirectoryNode currentDir = fileSystem.getCurrent();
 
-        if (alreadyExists(currentDir, argument)) {
+        if (currentDir.hasChild(argument)) {
             return Result.error(fileSystem, "Directory already exists");
         }
 
-        DirectoryNode newDirectory = new DirectoryNode(argument, currentDir, List.of());
-        DirectoryNode updatedDir = currentDir.addChild(newDirectory);
-        FileSystem updatedFs = fileSystem.setCurrent(updatedDir);
+        DirectoryNode newDirectory = new DirectoryNode(argument, currentDir, Collections.emptyList());
+        DirectoryNode updatedCurrentDir = currentDir.addChild(newDirectory);
 
-        return Result.success(updatedFs, "'" + argument + "' directory created");
+        // Propagar cambios y actualizar FileSystem completo.
+        FileSystem updatedFileSystem = FileSystemUpdater.replaceAndPropagate(fileSystem, updatedCurrentDir);
+
+        // Aseguramos que el current sea el directorio actualizado (con el nuevo hijo)
+        updatedFileSystem = new FileSystem(updatedFileSystem.getRoot(), updatedCurrentDir);
+
+        // Logs para debug
+        System.out.println("MKDIR Command: Created directory '" + argument + "'");
+        System.out.println("Updated Current: " + updatedFileSystem.getCurrent().name());
+        System.out.println("Root Children after mkdir:");
+        updatedFileSystem.getRoot().getChildren().forEach(child -> System.out.println("  - " + child.name()));
+
+        return Result.success(updatedFileSystem, "'" + argument + "' directory created");
     }
 
     private boolean isValidName(String name) {
         return name != null && !name.contains("/") && !name.contains(" ");
     }
-
-    private boolean alreadyExists(DirectoryNode directory, String name) {
-        return directory.hasChild(name);
-    }
 }
-
-
