@@ -5,31 +5,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
-
-import edu.austral.ingsis.clifford.commands.CommandParser;
 import org.junit.jupiter.api.Test;
 
 public class FileSystemNodeTests {
 
   private final CommandRunner runner = new CommandRunner();
 
-    private void executeTest(List<Map.Entry<String, String>> commands) {
-        List<String> commandInputs = commands.stream()
-                .map(Map.Entry::getKey)
-                .toList();
+  private void executeTest(List<Map.Entry<String, String>> commands) {
+    List<String> commandInputs = commands.stream().map(Map.Entry::getKey).toList();
 
-        List<String> actual = runner.executeCommands(commandInputs);
+    List<String> actual = runner.executeCommands(commandInputs);
 
-        List<String> expected = commands.stream()
-                .map(Map.Entry::getValue)
-                .toList();
+    List<String> expected = commands.stream().map(Map.Entry::getValue).toList();
 
-        assertEquals(expected, actual);
-    }
+    assertEquals(expected, actual);
+  }
 
-
-
-    @Test
+  @Test
   public void test1() {
     executeTest(
         List.of(
