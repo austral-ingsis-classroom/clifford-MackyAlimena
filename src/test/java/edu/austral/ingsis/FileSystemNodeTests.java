@@ -5,23 +5,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
+
+import edu.austral.ingsis.clifford.commands.CommandParser;
+import edu.austral.ingsis.clifford.filesystem.FileSystem;
 import org.junit.jupiter.api.Test;
 
 public class FileSystemNodeTests {
 
   private final CommandRunner runner = new CommandRunner();
 
-  private void executeTest(List<Map.Entry<String, String>> commandsAndResults) {
-    final List<String> commands = commandsAndResults.stream().map(Map.Entry::getKey).toList();
-    final List<String> expectedResult =
-        commandsAndResults.stream().map(Map.Entry::getValue).toList();
+    private void executeTest(List<Map.Entry<String, String>> commands) {
+        CommandParser parser = new CommandParser();
+        for (Map.Entry<String, String> entry : commands) {
+            String command = entry.getKey();
+            String expected = entry.getValue();
+            String actual = parser.parse(command);
 
-    final List<String> actualResult = runner.executeCommands(commands);
+            // LOG: estado actual del FileSystem
+            System.out.println("--- After command: " + command + " ---");
+            System.out.println("Expected: " + expected);
+            System.out.println("Actual  : " + actual);
+            System.out.println("Current Dir: " + parser.getFileSystem().getCurrent().name());
+            System.out.println("Root Children: ");
+            parser.getFileSystem().getRoot().getChildren()
+                    .forEach(child -> System.out.println("  - " + child.name()));
+            System.out.println("----------------------------");
 
-    assertEquals(expectedResult, actualResult);
-  }
+            assertEquals(expected, actual);
+        }
+    }
 
-  @Test
+
+
+    @Test
   public void test1() {
     executeTest(
         List.of(
@@ -61,6 +77,7 @@ public class FileSystemNodeTests {
 
   @Test
   void test4() {
+      System.out.println("--- Test Start ---");
     executeTest(
         List.of(
             entry("mkdir horace", "'horace' directory created"),
@@ -71,6 +88,7 @@ public class FileSystemNodeTests {
             entry("cd horace/jetta", "moved to directory 'jetta'"),
             entry("pwd", "/horace/jetta"),
             entry("cd /", "moved to directory '/'")));
+      System.out.println("--- Test Finnish ---");
   }
 
   @Test
