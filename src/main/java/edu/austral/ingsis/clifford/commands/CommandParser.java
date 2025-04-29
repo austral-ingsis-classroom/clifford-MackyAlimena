@@ -4,54 +4,50 @@ import edu.austral.ingsis.clifford.commands.result.Result;
 import edu.austral.ingsis.clifford.commands.types.*;
 import edu.austral.ingsis.clifford.filesystem.FileSystem;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CommandParser {
     private FileSystem fileSystem;
+    private final Map<String, Command> commandMap = new HashMap<>();
 
     public CommandParser() {
         this.fileSystem = FileSystem.init();
+        initializeCommands();
     }
+
+    private void initializeCommands() {
+        commandMap.put("ls", new LsCommand());
+        commandMap.put("cd", new CdCommand());
+        commandMap.put("touch", new TouchCommand());
+        commandMap.put("mkdir", new MkdirCommand());
+        commandMap.put("rm", new RmCommand());
+        commandMap.put("pwd", new PwdCommand());
+    }
+
     public FileSystem getFileSystem() {
         return fileSystem;
     }
 
-    public String parse(String argument) {
-        int endIndex = argument.indexOf(" ");
-        String commandArgument;
-        String commandInput;
+    public String parse(String input) {
+        int spaceIndex = input.indexOf(" ");
+        String commandName;
+        String argument;
 
-        if (endIndex == -1) {
-            commandArgument = argument;
-            commandInput = "";
+        if (spaceIndex == -1) {
+            commandName = input;
+            argument = "";
         } else {
-            commandArgument = argument.substring(0, endIndex);
-            commandInput = argument.substring(endIndex + 1);
+            commandName = input.substring(0, spaceIndex);
+            argument = input.substring(spaceIndex + 1);
         }
 
-        Command command;
-        switch (commandArgument) {
-            case "ls":
-                command = new LsCommand();
-                break;
-            case "cd":
-                command = new CdCommand();
-                break;
-            case "touch":
-                command = new TouchCommand();
-                break;
-            case "mkdir":
-                command = new MkdirCommand();
-                break;
-            case "rm":
-                command = new RmCommand();
-                break;
-            case "pwd":
-                command = new PwdCommand();
-                break;
-            default:
-                return "Command not found";
+        Command command = commandMap.get(commandName);
+        if (command == null) {
+            return "Command not found";
         }
 
-        Result result = command.execute(fileSystem, commandInput);
+        Result result = command.execute(fileSystem, argument);
         this.fileSystem = result.getFileSystem();
         return result.getMessage();
     }
